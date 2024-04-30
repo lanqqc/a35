@@ -3,13 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wykres notowań Dolara Amerykańskiego</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Wykres notowań funta brytyjskiego (GBP)</title>
+    <!-- Load plotly.js into the DOM -->
+    <script src='https://cdn.plot.ly/plotly-2.27.0.min.js'></script>
 </head>
 <body>
-    <div class="container">
-        <h1>Wykres notowań Dolara Amerykańskiego</h1>
-        <img src="chart.php" alt="Wykres">
-    </div>
+    <?php
+    $url = "http://api.nbp.pl/api/exchangerates/rates/a/gbp/last/10/?format=json";
+    $client = curl_init($url);
+    curl_setopt($client, CURLOPT_RETURNTRANSFER,true);
+    $response = curl_exec($client);
+    $result = json_decode($response);
+    ?>
+    <div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
+    <script>
+        var trace2 = {
+            x: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            y: [
+                <?php 
+                foreach($result->rates as $rate) {
+                    echo $rate->mid . ', ';
+                }
+                ?>
+            ],
+            mode: 'lines+markers',
+            name: 'spline',
+            line: {shape: 'spline'},
+            type: 'scatter'
+        };
+
+        var data = [trace2];
+
+        Plotly.newPlot('myDiv', data);
+    </script>
 </body>
 </html>
+
